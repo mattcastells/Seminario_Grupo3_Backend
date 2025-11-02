@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: sip3
+      MONGO_INITDB_ROOT_PASSWORD: sip3pass
+      MONGO_INITDB_DATABASE: sip3
+    volumes:
+      - mongo_data:/data/db
+  api:
+    build: .
+    environment:
+      MONGODB_URI: mongodb://sip3:sip3pass@mongo:27017/sip3?authSource=admin
+      JWT_SECRET: ${JWT_SECRET:ZGVmYXVsdFNpcDNKd3RTZWNyZXRLZXlGb3JEZXZlbG9wbWVudA==}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+volumes:
+  mongo_data:
