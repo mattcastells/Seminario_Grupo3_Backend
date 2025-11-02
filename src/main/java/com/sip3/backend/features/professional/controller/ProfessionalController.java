@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/professionals")
+@RequestMapping("/api/v1/professionals")
 public class ProfessionalController {
 
     private final ProfessionalService professionalService;

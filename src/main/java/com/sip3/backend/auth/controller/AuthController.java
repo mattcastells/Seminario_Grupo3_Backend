@@ -6,6 +6,7 @@ import com.sip3.backend.auth.dto.RegisterRequest;
 import com.sip3.backend.auth.service.AuthService;
 import com.sip3.backend.user.dto.UserProfileResponse;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final AuthService authService;
@@ -27,12 +29,18 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(authService.register(request));
+        log.info("Iniciando registro de usuario");
+        AuthResponse res = authService.register(request);
+        log.info("Register successful for user {}", res.username());
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.ok(authService.login(request));
+        log.info("Iniciando login de usuario");
+        AuthResponse res = authService.login(request);
+        log.info("Login successful for user {}", res.username());
+        return ResponseEntity.ok(res);
     }
 
     @GetMapping("/me")

@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/service-orders/{serviceOrderId}/messages")
+@RequestMapping("/api/v1/service-orders")
 public class ConversationMessageController {
 
     private final ConversationMessageService conversationMessageService;
@@ -25,14 +25,14 @@ public class ConversationMessageController {
         this.conversationMessageService = conversationMessageService;
     }
 
-    @PostMapping
+    @PostMapping("/{serviceOrderId}/messages")
     public ResponseEntity<MessageResponse> sendMessage(@PathVariable String serviceOrderId,
                                                        @Valid @RequestBody CreateMessageRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(conversationMessageService.sendMessage(serviceOrderId, request));
     }
 
-    @GetMapping
+    @GetMapping("/{serviceOrderId}/messages")
     public PagedResponse<MessageResponse> listMessages(@PathVariable String serviceOrderId,
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue = "50") int size) {
