@@ -9,6 +9,7 @@ public record ReviewResponse(
         String userDisplayName,
         int rating,
         String comment,
-        Instant createdAt
+        Instant createdAt,
+        ReviewReplyResponse reply
 ) {
 }
