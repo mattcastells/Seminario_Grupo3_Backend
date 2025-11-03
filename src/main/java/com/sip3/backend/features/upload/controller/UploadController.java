@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("/api/uploads")
+@RequestMapping("/api/v1/uploads")
 public class UploadController {
 
     @PostMapping
