@@ -1,6 +1,7 @@
 package com.sip3.backend.features.serviceorder.controller;
 
 import com.sip3.backend.common.payload.PagedResponse;
+import com.sip3.backend.features.serviceorder.dto.CompleteServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.CreateServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.ServiceOrderResponse;
 import com.sip3.backend.features.serviceorder.dto.UpdateServiceOrderRequest;
@@ -68,5 +69,12 @@ public class ServiceOrderController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         serviceOrderService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/complete")
+    public ServiceOrderResponse complete(@AuthenticationPrincipal UserDetails userDetails,
+                                         @PathVariable String id,
+                                         @Valid @RequestBody CompleteServiceOrderRequest request) {
+        return serviceOrderService.complete(userDetails.getUsername(), id, request);
     }
 }

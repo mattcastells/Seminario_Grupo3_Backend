@@ -1,6 +1,7 @@
 package com.sip3.backend.features.serviceorder.service;
 
 import com.sip3.backend.common.payload.PagedResponse;
+import com.sip3.backend.features.serviceorder.dto.CompleteServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.CreateServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.ServiceOrderResponse;
 import com.sip3.backend.features.serviceorder.dto.UpdateServiceOrderRequest;
@@ -19,4 +20,6 @@ public interface ServiceOrderService {
     ServiceOrderResponse update(String id, UpdateServiceOrderRequest request);
 
     void delete(String id);
+    
+    ServiceOrderResponse complete(String userId, String serviceOrderId, CompleteServiceOrderRequest request);
 }
