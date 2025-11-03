@@ -9,4 +9,6 @@ public interface ConversationMessageService {
     MessageResponse sendMessage(String serviceOrderId, CreateMessageRequest request);
 
     PagedResponse<MessageResponse> listMessages(String serviceOrderId, int page, int size);
+
+    void deleteAllMessages(String serviceOrderId);
 }

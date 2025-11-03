@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,5 +38,11 @@ public class ConversationMessageController {
                                                        @RequestParam(defaultValue = "0") int page,
                                                        @RequestParam(defaultValue = "50") int size) {
         return conversationMessageService.listMessages(serviceOrderId, page, size);
+    }
+
+    @DeleteMapping("/{serviceOrderId}/messages")
+    public ResponseEntity<Void> deleteAllMessages(@PathVariable String serviceOrderId) {
+        conversationMessageService.deleteAllMessages(serviceOrderId);
+        return ResponseEntity.noContent().build();
     }
 }

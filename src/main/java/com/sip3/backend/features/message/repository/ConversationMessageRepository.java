@@ -8,4 +8,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 public interface ConversationMessageRepository extends MongoRepository<ConversationMessage, String> {
 
     Page<ConversationMessage> findByServiceOrderIdOrderByCreatedAtAsc(String serviceOrderId, Pageable pageable);
+
+    void deleteByServiceOrderId(String serviceOrderId);
 }

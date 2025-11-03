@@ -47,4 +47,9 @@ public class ConversationMessageServiceImpl implements ConversationMessageServic
                 result.getSize()
         );
     }
+
+    @Override
+    public void deleteAllMessages(String serviceOrderId) {
+        conversationMessageRepository.deleteByServiceOrderId(serviceOrderId);
+    }
 }
