@@ -22,6 +22,12 @@ public record ServiceOrderResponse(
         Instant scheduledAt,
         String lastMessagePreview,
         Instant lastMessageAt,
+        Boolean completedByClient,
+        Integer clientRating,
+        String clientComment,
+        Boolean completedByProfessional,
+        Integer professionalRating,
+        String professionalComment,
         Instant createdAt,
         Instant updatedAt
 ) {

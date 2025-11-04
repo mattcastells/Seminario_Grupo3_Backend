@@ -52,6 +52,15 @@ public class ServiceOrder {
 
     private String paymentPreference;
 
+    // Campos para completado bidireccional
+    private Boolean completedByClient;
+    private Integer clientRating; // 1-5
+    private String clientComment;
+
+    private Boolean completedByProfessional;
+    private Integer professionalRating; // 1-5
+    private String professionalComment;
+
     @CreatedDate
     private Instant createdAt;
 

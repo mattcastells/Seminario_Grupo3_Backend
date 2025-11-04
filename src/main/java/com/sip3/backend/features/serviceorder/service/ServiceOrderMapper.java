@@ -47,6 +47,12 @@ public class ServiceOrderMapper {
                 order.getScheduledAt(),
                 order.getLastMessagePreview(),
                 order.getLastMessageAt(),
+                order.getCompletedByClient(),
+                order.getClientRating(),
+                order.getClientComment(),
+                order.getCompletedByProfessional(),
+                order.getProfessionalRating(),
+                order.getProfessionalComment(),
                 order.getCreatedAt(),
                 order.getUpdatedAt()
         );

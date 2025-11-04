@@ -117,47 +117,86 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         ServiceOrder order = serviceOrderRepository.findById(serviceOrderId)
                 .orElseThrow(() -> new NotFoundException("Solicitud no encontrada"));
 
-        // Verificar que el usuario sea el dueño de la orden
-        if (!order.getUserId().equals(userId)) {
+        // Determinar si quien completa es el cliente o el profesional
+        boolean isClient = order.getUserId().equals(userId);
+        boolean isProfessional = false;
+
+        // Verificar si el usuario es el profesional
+        try {
+            ProfessionalProfile professionalProfile = professionalRepository.findByUserId(userId)
+                    .orElse(null);
+            if (professionalProfile != null && professionalProfile.getId().equals(order.getProfessionalId())) {
+                isProfessional = true;
+            }
+        } catch (Exception e) {
+            // Ignorar si no es profesional
+        }
+
+        // Verificar que el usuario tenga permiso (sea cliente o profesional de esta orden)
+        if (!isClient && !isProfessional) {
             throw new RuntimeException("No tenés permiso para completar esta orden");
         }
 
-        // Verificar que la orden no esté ya completada
+        // Verificar que la orden no esté ya completada por completo
         if (order.getStatus() == ServiceOrderStatus.COMPLETED) {
-            throw new RuntimeException("Esta orden ya fue completada");
+            throw new RuntimeException("Esta orden ya fue completada por ambas partes");
         }
 
-        // Actualizar el estado de la orden
-        order.setStatus(ServiceOrderStatus.COMPLETED);
+        // Actualizar según quien completa
+        if (isClient) {
+            // Cliente completa y califica al profesional
+            if (Boolean.TRUE.equals(order.getCompletedByClient())) {
+                throw new RuntimeException("Ya completaste y calificaste este trabajo");
+            }
+
+            order.setCompletedByClient(true);
+            order.setClientRating(request.rating());
+            order.setClientComment(request.comment());
+
+            // Crear review para el profesional
+            Review review = Review.builder()
+                    .professionalId(order.getProfessionalId())
+                    .userId(userId)
+                    .rating(request.rating())
+                    .comment(request.comment())
+                    .createdAt(Instant.now())
+                    .build();
+            reviewRepository.save(review);
+
+            // Actualizar el rating del profesional
+            ProfessionalProfile professional = professionalRepository.findById(order.getProfessionalId())
+                    .orElseThrow(() -> new NotFoundException("Profesional no encontrado"));
+            List<Review> allReviews = reviewRepository.findByProfessionalId(order.getProfessionalId());
+            double newRating = allReviews.stream()
+                    .mapToInt(Review::getRating)
+                    .average()
+                    .orElse(0.0);
+            professional.setRating(newRating);
+            professional.setReviewsCount(allReviews.size());
+            professionalRepository.save(professional);
+
+        } else if (isProfessional) {
+            // Profesional completa y califica al cliente
+            if (Boolean.TRUE.equals(order.getCompletedByProfessional())) {
+                throw new RuntimeException("Ya completaste y calificaste este trabajo");
+            }
+
+            order.setCompletedByProfessional(true);
+            order.setProfessionalRating(request.rating());
+            order.setProfessionalComment(request.comment());
+
+            // TODO: Crear review para el cliente (si implementamos sistema de reviews para clientes)
+            // Por ahora solo guardamos en la orden
+        }
+
+        // Solo marcar como COMPLETED si ambos completaron
+        if (Boolean.TRUE.equals(order.getCompletedByClient()) &&
+            Boolean.TRUE.equals(order.getCompletedByProfessional())) {
+            order.setStatus(ServiceOrderStatus.COMPLETED);
+        }
+
         order.setLastMessageAt(Instant.now());
         ServiceOrder savedOrder = serviceOrderRepository.save(order);
-
-        // Crear la review
-        Review review = Review.builder()
-                .professionalId(order.getProfessionalId())
-                .userId(userId)
-                .rating(request.rating())
-                .comment(request.comment())
-                .createdAt(Instant.now())
-                .build();
-        reviewRepository.save(review);
-
-        // Actualizar el rating del profesional
-        ProfessionalProfile professional = professionalRepository.findById(order.getProfessionalId())
-                .orElseThrow(() -> new NotFoundException("Profesional no encontrado"));
-
-        // Obtener todas las reviews del profesional
-        List<Review> allReviews = reviewRepository.findByProfessionalId(order.getProfessionalId());
-        
-        // Calcular el nuevo rating promedio
-        double newRating = allReviews.stream()
-                .mapToInt(Review::getRating)
-                .average()
-                .orElse(0.0);
-
-        professional.setRating(newRating);
-        professional.setReviewsCount(allReviews.size());
-        professionalRepository.save(professional);
 
         return serviceOrderMapper.toResponse(savedOrder);
     }
