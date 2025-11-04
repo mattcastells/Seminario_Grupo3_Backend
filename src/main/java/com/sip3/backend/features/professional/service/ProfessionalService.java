@@ -19,4 +19,6 @@ public interface ProfessionalService {
                                                Integer minExperience, int page, int size);
 
     ProfessionalResponse getByUserId(String userId);
+
+    void recalculateAllReviewsCount();
 }

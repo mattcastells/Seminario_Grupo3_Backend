@@ -64,9 +64,9 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         Pageable pageable = PageRequest.of(page, size);
         Page<ServiceOrder> result;
         if (status != null) {
-            result = serviceOrderRepository.findByUserIdAndStatus(userId, status, pageable);
+            result = serviceOrderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status, pageable);
         } else {
-            result = serviceOrderRepository.findByUserId(userId, pageable);
+            result = serviceOrderRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
         }
         return new PagedResponse<>(
                 result.getContent().stream().map(serviceOrderMapper::toResponse).collect(Collectors.toList()),
@@ -81,7 +81,7 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     @Transactional(readOnly = true)
     public PagedResponse<ServiceOrderResponse> listForProfessional(String professionalId, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<ServiceOrder> result = serviceOrderRepository.findByProfessionalId(professionalId, pageable);
+        Page<ServiceOrder> result = serviceOrderRepository.findByProfessionalIdOrderByCreatedAtDesc(professionalId, pageable);
         return new PagedResponse<>(
                 result.getContent().stream().map(serviceOrderMapper::toResponse).collect(Collectors.toList()),
                 result.getTotalElements(),

@@ -3,6 +3,7 @@ package com.sip3.backend.config;
 import com.sip3.backend.features.professional.model.ProfessionalProfile;
 import com.sip3.backend.features.professional.model.VerificationStatus;
 import com.sip3.backend.features.professional.repository.ProfessionalRepository;
+import com.sip3.backend.features.professional.service.ProfessionalService;
 import com.sip3.backend.user.model.Role;
 import com.sip3.backend.user.model.User;
 import com.sip3.backend.user.model.UserProfile;
@@ -26,6 +27,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final ProfessionalRepository professionalRepository;
+    private final ProfessionalService professionalService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -35,6 +37,11 @@ public class DataInitializer implements CommandLineRunner {
             log.info("Database is empty. Initializing with sample data...");
             createCommonUsers();
             createProfessionalUsers();
+            
+            // Recalculate review counts and ratings based on actual data
+            log.info("Recalculating review counts and ratings...");
+            professionalService.recalculateAllReviewsCount();
+            
             log.info("Sample data initialization completed!");
         } else {
             log.info("Database already contains data. Skipping initialization.");
@@ -138,8 +145,8 @@ public class DataInitializer implements CommandLineRunner {
                 .experienceYears((int) (Math.random() * 15) + 5) // 5-20 years of experience
                 .services(services)
                 .tags(Arrays.asList(profession.toLowerCase(), "confiable", "puntual", "garantía"))
-                .rating(4.0 + Math.random()) // Rating between 4.0 and 5.0
-                .reviewsCount((int) (Math.random() * 50) + 10) // 10-60 reviews
+                .rating(null) // Will be calculated from actual reviews
+                .reviewsCount(0) // Will be calculated from actual reviews
                 .distanceKm(Math.random() * 10) // Within 10km
                 .address("Dirección de ejemplo, " + (1000 + (int)(Math.random() * 9000)) + ", Argentina")
                 .minRate(minRate)

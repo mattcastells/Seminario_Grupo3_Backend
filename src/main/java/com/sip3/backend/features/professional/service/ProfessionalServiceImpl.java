@@ -7,6 +7,7 @@ import com.sip3.backend.features.professional.dto.ProfessionalResponse;
 import com.sip3.backend.features.professional.dto.UpdateProfessionalRequest;
 import com.sip3.backend.features.professional.model.ProfessionalProfile;
 import com.sip3.backend.features.professional.repository.ProfessionalRepository;
+import com.sip3.backend.features.review.repository.ReviewRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -28,13 +29,16 @@ public class ProfessionalServiceImpl implements ProfessionalService {
     private final ProfessionalRepository professionalRepository;
     private final ProfessionalMapper professionalMapper;
     private final MongoTemplate mongoTemplate;
+    private final ReviewRepository reviewRepository;
 
     public ProfessionalServiceImpl(ProfessionalRepository professionalRepository,
                                    ProfessionalMapper professionalMapper,
-                                   MongoTemplate mongoTemplate) {
+                                   MongoTemplate mongoTemplate,
+                                   ReviewRepository reviewRepository) {
         this.professionalRepository = professionalRepository;
         this.professionalMapper = professionalMapper;
         this.mongoTemplate = mongoTemplate;
+        this.reviewRepository = reviewRepository;
     }
 
     @Override
@@ -121,5 +125,34 @@ public class ProfessionalServiceImpl implements ProfessionalService {
         ProfessionalProfile profile = professionalRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("Profesional no encontrado para el usuario"));
         return professionalMapper.toResponse(profile);
+    }
+
+    @Override
+    @Transactional
+    public void recalculateAllReviewsCount() {
+        List<ProfessionalProfile> allProfessionals = professionalRepository.findAll();
+        
+        for (ProfessionalProfile professional : allProfessionals) {
+            Page<com.sip3.backend.features.review.model.Review> reviews = reviewRepository.findByProfessionalId(
+                professional.getId(), 
+                Pageable.unpaged()
+            );
+            
+            int reviewCount = (int) reviews.getTotalElements();
+            double averageRating = 0.0;
+            
+            if (reviewCount > 0) {
+                averageRating = reviews.getContent()
+                    .stream()
+                    .mapToInt(com.sip3.backend.features.review.model.Review::getRating)
+                    .average()
+                    .orElse(0.0);
+                averageRating = Math.round(averageRating * 10.0) / 10.0;
+            }
+            
+            professional.setReviewsCount(reviewCount);
+            professional.setRating(reviewCount > 0 ? averageRating : null);
+            professionalRepository.save(professional);
+        }
     }
 }

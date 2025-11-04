@@ -8,9 +8,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface ServiceOrderRepository extends MongoRepository<ServiceOrder, String> {
 
-    Page<ServiceOrder> findByUserId(String userId, Pageable pageable);
+    Page<ServiceOrder> findByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
 
-    Page<ServiceOrder> findByProfessionalId(String professionalId, Pageable pageable);
+    Page<ServiceOrder> findByProfessionalIdOrderByCreatedAtDesc(String professionalId, Pageable pageable);
 
-    Page<ServiceOrder> findByUserIdAndStatus(String userId, ServiceOrderStatus status, Pageable pageable);
+    Page<ServiceOrder> findByUserIdAndStatusOrderByCreatedAtDesc(String userId, ServiceOrderStatus status, Pageable pageable);
 }
