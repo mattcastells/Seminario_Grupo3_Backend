@@ -14,6 +14,7 @@ import com.sip3.backend.features.serviceorder.dto.UpdateServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.model.ServiceOrder;
 import com.sip3.backend.features.serviceorder.model.ServiceOrderStatus;
 import com.sip3.backend.features.serviceorder.repository.ServiceOrderRepository;
+import com.sip3.backend.user.repository.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,15 +33,18 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
     private final ServiceOrderMapper serviceOrderMapper;
     private final ProfessionalRepository professionalRepository;
     private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     public ServiceOrderServiceImpl(ServiceOrderRepository serviceOrderRepository,
                                    ServiceOrderMapper serviceOrderMapper,
                                    ProfessionalRepository professionalRepository,
-                                   ReviewRepository reviewRepository) {
+                                   ReviewRepository reviewRepository,
+                                   UserRepository userRepository) {
         this.serviceOrderRepository = serviceOrderRepository;
         this.serviceOrderMapper = serviceOrderMapper;
         this.professionalRepository = professionalRepository;
         this.reviewRepository = reviewRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -121,16 +125,47 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         boolean isClient = order.getUserId().equals(userId);
         boolean isProfessional = false;
 
-        // Verificar si el usuario es el profesional
+        // DEBUG LOGS
+        System.out.println("=== COMPLETE ORDER DEBUG ===");
+        System.out.println("userId recibido: '" + userId + "'");
+        System.out.println("order.getUserId(): '" + order.getUserId() + "'");
+        System.out.println("order.getProfessionalId(): '" + order.getProfessionalId() + "'");
+        System.out.println("isClient: " + isClient);
+
+        // Verificar si el usuario es el profesional de esta orden
+        // El userId que llega es el username, y ProfessionalProfile.userId es el User._id (MongoDB ObjectId)
+        // Necesitamos: username -> User._id -> comparar con ProfessionalProfile.userId
         try {
-            ProfessionalProfile professionalProfile = professionalRepository.findByUserId(userId)
-                    .orElse(null);
-            if (professionalProfile != null && professionalProfile.getId().equals(order.getProfessionalId())) {
-                isProfessional = true;
+            // Paso 1: Buscar el User por username para obtener su _id
+            var user = userRepository.findByUsernameIgnoreCase(userId).orElse(null);
+            System.out.println("User encontrado por username '" + userId + "': " + (user != null));
+
+            if (user != null) {
+                String userMongoId = user.getId();
+                System.out.println("User MongoDB ID: '" + userMongoId + "'");
+
+                // Paso 2: Buscar el ProfessionalProfile por userId (que es el User._id)
+                ProfessionalProfile professionalProfile = professionalRepository.findByUserId(userMongoId).orElse(null);
+                System.out.println("ProfessionalProfile encontrado: " + (professionalProfile != null));
+
+                if (professionalProfile != null) {
+                    System.out.println("ProfessionalProfile.getId(): '" + professionalProfile.getId() + "'");
+                    System.out.println("Order.getProfessionalId(): '" + order.getProfessionalId() + "'");
+
+                    // Paso 3: Comparar el ID del profesional con el professionalId de la orden
+                    if (professionalProfile.getId().equals(order.getProfessionalId())) {
+                        isProfessional = true;
+                        System.out.println("¡MATCH! Usuario ES el profesional de esta orden");
+                    }
+                }
             }
         } catch (Exception e) {
-            // Ignorar si no es profesional
+            System.out.println("Error verificando si es profesional: " + e.getMessage());
+            e.printStackTrace();
         }
+
+        System.out.println("isProfessional FINAL: " + isProfessional);
+        System.out.println("=== FIN DEBUG ===");
 
         // Verificar que el usuario tenga permiso (sea cliente o profesional de esta orden)
         if (!isClient && !isProfessional) {
