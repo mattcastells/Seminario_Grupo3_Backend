@@ -1,18 +1,22 @@
+server:
+  port: ${PORT:8080}
+
 spring:
   application:
     name: sip3-backend
   data:
     mongodb:
-      uri: ${MONGODB_URI:mongodb+srv://gulincastellsmatias_db_user:zzQH5UOqXMMpwpGW@sip-3.ca4ddta.mongodb.net/sip3db?appName=SIP-3}
+      uri: ${MONGODB_URI:mongodb://localhost:27017/sip3}
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
 
 app:
   jwt:
-    secret: ${JWT_SECRET:ZGVmYXVsdFNpcDNKd3RTZWNyZXRLZXlGb3JEZXZlbG9wbWVudA==}
+    secret: ${JWT_SECRET:please-change-this-secret-key-in-production}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
 
 logging:
   level:
     org.springframework.security: INFO
+    com.sip3.backend: DEBUG

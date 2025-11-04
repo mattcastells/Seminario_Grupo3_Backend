@@ -6,6 +6,7 @@ import com.sip3.backend.features.professional.model.ProfessionalProfile;
 import com.sip3.backend.features.professional.repository.ProfessionalRepository;
 import com.sip3.backend.features.review.model.Review;
 import com.sip3.backend.features.review.repository.ReviewRepository;
+import com.sip3.backend.features.serviceorder.dto.CancelServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.CompleteServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.CreateServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.ServiceOrderResponse;
@@ -157,6 +158,33 @@ public class ServiceOrderServiceImpl implements ServiceOrderService {
         professional.setRating(newRating);
         professional.setReviewsCount(allReviews.size());
         professionalRepository.save(professional);
+
+        return serviceOrderMapper.toResponse(savedOrder);
+    }
+
+    @Override
+    public ServiceOrderResponse cancel(String userId, String serviceOrderId, CancelServiceOrderRequest request) {
+        // Obtener la orden de servicio
+        ServiceOrder order = serviceOrderRepository.findById(serviceOrderId)
+                .orElseThrow(() -> new NotFoundException("Solicitud no encontrada"));
+
+        // Verificar que el usuario sea el dueño de la orden
+        if (!order.getUserId().equals(userId)) {
+            throw new RuntimeException("No tenés permiso para cancelar esta orden");
+        }
+
+        // Verificar que la orden no esté ya completada o cancelada
+        if (order.getStatus() == ServiceOrderStatus.COMPLETED) {
+            throw new RuntimeException("No se puede cancelar un trabajo ya completado");
+        }
+        if (order.getStatus() == ServiceOrderStatus.CANCELLED) {
+            throw new RuntimeException("Esta orden ya fue cancelada");
+        }
+
+        // Actualizar el estado de la orden a CANCELLED
+        order.setStatus(ServiceOrderStatus.CANCELLED);
+        order.setLastMessageAt(Instant.now());
+        ServiceOrder savedOrder = serviceOrderRepository.save(order);
 
         return serviceOrderMapper.toResponse(savedOrder);
     }
