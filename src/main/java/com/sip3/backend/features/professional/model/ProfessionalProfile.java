@@ -54,6 +54,8 @@ public class ProfessionalProfile {
 
     private BigDecimal maxRate;
 
+    private String avatarUrl;
+
     private String contactEmail;
 
     private String contactPhone;

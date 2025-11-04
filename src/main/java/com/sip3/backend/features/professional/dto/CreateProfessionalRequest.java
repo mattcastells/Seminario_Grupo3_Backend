@@ -41,6 +41,8 @@ public record CreateProfessionalRequest(
 
         BigDecimal maxRate,
 
+        String avatarUrl,
+
         @Email(message = "Correo inválido")
         String contactEmail,
 

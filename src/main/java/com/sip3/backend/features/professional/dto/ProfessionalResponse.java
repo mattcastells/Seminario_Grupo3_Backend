@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 
-public record ProfessionalResponse(
+public record   ProfessionalResponse(
         String id,
         String userId,
         String displayName,
@@ -22,6 +22,7 @@ public record ProfessionalResponse(
         String address,
         BigDecimal minRate,
         BigDecimal maxRate,
+        String avatarUrl,
         String contactEmail,
         String contactPhone,
         List<String> paymentMethods,

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ProfessionalMapper {
+    private static final String DEFAULT_AVATAR_URL = "https://res.cloudinary.com/dtjbknm5h/image/upload/v1762221202/default-professional_krz09k.png";
 
     public ProfessionalProfile toEntity(CreateProfessionalRequest request) {
         return ProfessionalProfile.builder()
@@ -24,6 +25,7 @@ public class ProfessionalMapper {
                 .address(request.address())
                 .minRate(request.minRate())
                 .maxRate(request.maxRate())
+                .avatarUrl(request.avatarUrl())
                 .contactEmail(request.contactEmail())
                 .contactPhone(request.contactPhone())
                 .paymentMethods(request.paymentMethods())
@@ -51,6 +53,7 @@ public class ProfessionalMapper {
                 profile.getAddress(),
                 profile.getMinRate(),
                 profile.getMaxRate(),
+                profile.getAvatarUrl(),
                 profile.getContactEmail(),
                 profile.getContactPhone(),
                 profile.getPaymentMethods(),
@@ -96,6 +99,9 @@ public class ProfessionalMapper {
         }
         if (request.maxRate() != null) {
             profile.setMaxRate(request.maxRate());
+        }
+        if (request.avatarUrl() != null) {
+            profile.setAvatarUrl(request.avatarUrl());
         }
         if (request.contactEmail() != null) {
             profile.setContactEmail(request.contactEmail());

@@ -22,6 +22,7 @@ public record UpdateProfessionalRequest(
         String address,
         BigDecimal minRate,
         BigDecimal maxRate,
+        String avatarUrl,
         @Email
         String contactEmail,
         String contactPhone,
