@@ -23,6 +23,7 @@ public class UserMapper {
                 user.getPhone(),
                 profile != null ? profile.getFullName() : null,
                 profile != null ? profile.getLocation() : null,
+                profile != null ? profile.getAvatarUrl() : null,
                 profile != null ? profile.getPreferredPaymentMethods() : null,
                 roles,
                 user.getCreatedAt(),
@@ -40,6 +41,7 @@ public class UserMapper {
         profile.setLocation(request.location());
         profile.setPhone(request.phone());
         profile.setEmail(request.email());
+        profile.setAvatarUrl(request.avatarUrl());
         profile.setPreferredPaymentMethods(request.preferredPaymentMethods());
 
         if (!Objects.equals(user.getEmail(), request.email())) {

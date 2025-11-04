@@ -11,6 +11,7 @@ public record UserProfileResponse(
         String phone,
         String fullName,
         String location,
+        String avatarUrl,
         List<String> preferredPaymentMethods,
         Set<String> roles,
         Instant createdAt,

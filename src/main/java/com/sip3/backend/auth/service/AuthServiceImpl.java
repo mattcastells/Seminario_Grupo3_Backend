@@ -67,6 +67,7 @@ public class AuthServiceImpl implements AuthService {
                 .roles(roles)
                 .profile(UserProfile.builder()
                         .fullName(request.fullName())
+                        .avatarUrl("https://res.cloudinary.com/dtjbknm5h/image/upload/v1762223757/user_hzfwna.jpg")
                         .build())
                 .build();
 

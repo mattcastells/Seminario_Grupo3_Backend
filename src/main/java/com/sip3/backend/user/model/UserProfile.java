@@ -17,4 +17,5 @@ public class UserProfile {
     private String phone;
     private String email;
     private List<String> preferredPaymentMethods;
+    private String avatarUrl;
 }

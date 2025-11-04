@@ -23,6 +23,8 @@ public record UserProfileUpdateRequest(
         @Email(message = "Correo inválido")
         String email,
 
+        String avatarUrl,
+
         List<String> preferredPaymentMethods
 ) {
 }

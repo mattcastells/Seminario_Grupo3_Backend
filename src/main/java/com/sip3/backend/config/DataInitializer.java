@@ -103,6 +103,7 @@ public class DataInitializer implements CommandLineRunner {
                 .location(location)
                 .phone(phone)
                 .email(email)
+                .avatarUrl("https://res.cloudinary.com/dtjbknm5h/image/upload/v1762223757/user_hzfwna.jpg")
                 .preferredPaymentMethods(Arrays.asList("Efectivo", "Transferencia bancaria"))
                 .build();
 
