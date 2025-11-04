@@ -1,6 +1,7 @@
 package com.sip3.backend.features.serviceorder.controller;
 
 import com.sip3.backend.common.payload.PagedResponse;
+import com.sip3.backend.features.serviceorder.dto.CancelServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.CompleteServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.CreateServiceOrderRequest;
 import com.sip3.backend.features.serviceorder.dto.ServiceOrderResponse;
@@ -76,5 +77,12 @@ public class ServiceOrderController {
                                          @PathVariable String id,
                                          @Valid @RequestBody CompleteServiceOrderRequest request) {
         return serviceOrderService.complete(userDetails.getUsername(), id, request);
+    }
+
+    @PostMapping("/{id}/cancel")
+    public ServiceOrderResponse cancel(@AuthenticationPrincipal UserDetails userDetails,
+                                       @PathVariable String id,
+                                       @Valid @RequestBody CancelServiceOrderRequest request) {
+        return serviceOrderService.cancel(userDetails.getUsername(), id, request);
     }
 }
